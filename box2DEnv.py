@@ -33,6 +33,7 @@ class Box2DEnv(gym.Env):
     # }
 
     def __init__(self, mat):
+        # mat=mat_dict["mat"]
 
         self.target_col = 0
         self.target_row = 0
@@ -104,15 +105,15 @@ if __name__ == '__main__':
     b=[0,1,1]
     c=[0,2,2]
 
-    print(a)
-    print(env.step(a))
+    # 向右移动
+    print(env.step([0,0,1]))
+    # 向右移动
+    print(env.step([0,1,1]))
+    # 向右移动 移出边界的情况
+    print(env.step([0,1,1]))
+    # 向下移动，到达目的地
+    print(env.step([0,2,2]))
 
-    print(env.step(b))
-    print(env.step(b))
-    print(env.step(c))
     print(env.reset())
-    print(env.step(a))
 
-    # b=env.action_space.sample()
-    # print(b)
-    # env.step(b)
+
