@@ -6,7 +6,7 @@ from gym import spaces
 import numpy as np
 
 
-class Box2DEnv(gym.Env):
+class Box_Env(gym.Env):
     """
     功能：如下环境封装为 gym env，用于验证强化学习 action masking。
 
@@ -27,33 +27,34 @@ class Box2DEnv(gym.Env):
     奖励函数：每走一步reward为 -1。
 
     """
+
     # metadata = {
     #     'render.modes': ['human', 'rgb_array'],
     #     'video.frames_per_second': 2
     # }
 
-    def __init__(self, mat):
+    def __init__(self, map):
         # mat=mat_dict["mat"]
 
         self.target_col = 0
         self.target_row = 0
-        self.start_mat = np.array(mat)
-        self.mat = np.array(mat)
-        self.h, self.w = self.mat.shape
+        self.start_mat = np.array(map)
+        self.map = np.array(map)
+        self.h, self.w = self.map.shape
         for i in range(self.h):
             for j in range(self.w):
-                if mat[i][j] == -1:
+                if map[i][j] == -1:
                     self.target_col = i
                     self.target_row = j
 
-        self.observation_space = spaces.Box(-1,1,shape=(self.h, self.w), dtype=np.int)
+        self.observation_space = spaces.Box(-1, 1, shape=(self.h, self.w), dtype=np.int)
 
         # [h,w,4]->(col,row,action)
-        self.action_space = spaces.MultiDiscrete([self.h,self.w,4])
+        self.action_space = spaces.MultiDiscrete([self.h, self.w, 4])
 
     def step(self, action):
 
-        if self.mat[action[0]][action[1]] == 1:
+        if self.map[action[0]][action[1]] == 1:
             assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
 
             # 适合多个箱子
@@ -67,9 +68,9 @@ class Box2DEnv(gym.Env):
             # h对应x，w对应y
             if self.h > col >= 0 and self.w > row >= 0:
                 # 移动前的位置置0
-                self.mat[state[0]][state[1]] = 0
+                self.map[state[0]][state[1]] = 0
                 # 当前箱子位置置1
-                self.mat[col][row] = 1
+                self.map[col][row] = 1
 
                 state = np.array([col, row])
                 # self.counts += 1
@@ -79,17 +80,16 @@ class Box2DEnv(gym.Env):
 
             reward = -1
 
-            return self.mat, reward, done, {}
+            return self.map, reward, done, {}
         reward = -1
         done = False
-        return self.mat, reward, done, {}
-
+        return self.map, reward, done, {}
 
     def reset(self):
         # self.state = np.array([self.start_col,self.start_row])
         self.counts = 0
-        self.mat = np.copy(self.start_mat)
-        return self.mat
+        self.map = np.copy(self.start_mat)
+        return self.map
 
     def render(self, mode='human'):
         return None
@@ -99,21 +99,16 @@ class Box2DEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = Box2DEnv([[1,0,0],[0,0,-1]])
+    env = Box_Env([[1, 0, 0], [0, 0, -1]])
     env.reset()
-    a=[0,0,1]
-    b=[0,1,1]
-    c=[0,2,2]
 
     # 向右移动
-    print(env.step([0,0,1]))
+    print(env.step([0, 0, 1]))
     # 向右移动
-    print(env.step([0,1,1]))
+    print(env.step([0, 1, 1]))
     # 向右移动 移出边界的情况
-    print(env.step([0,1,1]))
+    print(env.step([0, 1, 1]))
     # 向下移动，到达目的地
-    print(env.step([0,2,2]))
+    print(env.step([0, 2, 2]))
 
     print(env.reset())
-
-
